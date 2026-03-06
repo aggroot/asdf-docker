@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source "$(dirname "$0")/../lib/utils.bash"
+
+mkdir -p "${ASDF_INSTALL_PATH}/bin"
+
+# Install only the docker CLI binary (not dockerd, containerd, etc.)
+if [[ -f "${ASDF_DOWNLOAD_PATH}/docker" ]]; then
+  cp "${ASDF_DOWNLOAD_PATH}/docker" "${ASDF_INSTALL_PATH}/bin/docker"
+  chmod +x "${ASDF_INSTALL_PATH}/bin/docker"
+else
+  echo "ERROR: docker binary not found in download" >&2
+  exit 1
+fi
+
+# Also install docker-compose if present (bundled in newer releases)
+if [[ -f "${ASDF_DOWNLOAD_PATH}/docker-compose" ]]; then
+  cp "${ASDF_DOWNLOAD_PATH}/docker-compose" "${ASDF_INSTALL_PATH}/bin/docker-compose"
+  chmod +x "${ASDF_INSTALL_PATH}/bin/docker-compose"
+fi
+
+echo "Docker CLI ${ASDF_INSTALL_VERSION} installed to ${ASDF_INSTALL_PATH}/bin"

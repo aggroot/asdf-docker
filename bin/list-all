@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Docker static binary download page
+base_url="https://download.docker.com/linux/static/stable/x86_64/"
+
+# Fetch version list from Docker's download page
+versions=$(curl -sL "$base_url" \
+  | grep -oE 'docker-[0-9]+\.[0-9]+\.[0-9]+(-ce)?\.tgz' \
+  | sed -E 's/docker-([0-9]+\.[0-9]+\.[0-9]+)(-ce)?\.tgz/\1/' \
+  | sort -t. -k1,1n -k2,2n -k3,3n \
+  | uniq)
+
+echo "$versions"

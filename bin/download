@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source "$(dirname "$0")/../lib/utils.bash"
+
+version="$ASDF_DOWNLOAD_PATH/../version"
+version=$(cat "$version" 2>/dev/null || echo "$ASDF_INSTALL_VERSION")
+
+arch=$(get_arch)
+platform=$(get_platform)
+
+download_url="https://download.docker.com/${platform}/static/stable/${arch}/docker-${version}.tgz"
+
+echo "Downloading Docker CLI ${version} for ${platform}/${arch}..."
+
+mkdir -p "$ASDF_DOWNLOAD_PATH"
+
+if ! curl -fsSL "$download_url" -o "${ASDF_DOWNLOAD_PATH}/docker.tgz"; then
+  # Try with -ce suffix
+  download_url="https://download.docker.com/${platform}/static/stable/${arch}/docker-${version}-ce.tgz"
+  echo "Trying with -ce suffix..."
+  curl -fsSL "$download_url" -o "${ASDF_DOWNLOAD_PATH}/docker.tgz"
+fi
+
+tar -xzf "${ASDF_DOWNLOAD_PATH}/docker.tgz" -C "$ASDF_DOWNLOAD_PATH" --strip-components=1
+rm -f "${ASDF_DOWNLOAD_PATH}/docker.tgz"
